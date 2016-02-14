@@ -43,13 +43,21 @@ func getConfigFileName() (string, error) {
 	if fileConfig.ConfigFile != "" {
 		return fileConfig.ConfigFile, nil
 	}
-	for _, file := range []string{
-		"config.yml",
-		"config.yaml",
-		"config.json",
+	app := path.Base(os.Args[0])
+	for _, dir := range []string{
+		"",
+		path.Join(os.Getenv("HOME"), "."+app),
+		"/etc/" + app,
 	} {
-		if fileExists(file) {
-			return file, nil
+		for _, file := range []string{
+			"config.yaml",
+			"config.yml",
+			"config.json",
+		} {
+			fileName := path.Join(dir, file)
+			if fileExists(fileName) {
+				return fileName, nil
+			}
 		}
 	}
 	return "", nil
