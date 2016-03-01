@@ -22,11 +22,11 @@ func ParseCommand(cfg interface{}) (*flags.Command, error) {
 		return nil, err
 	}
 	if file != "" {
-		if err := parseConfigFile(file, cfg); err != nil {
+		if err := ParseFile(file, cfg); err != nil {
 			return nil, err
 		}
 	}
-	parser := flags.NewParser(cfg, flags.HelpFlag|flags.PassDoubleDash)
+	parser := flags.NewParser(cfg, flags.HelpFlag|flags.PassDoubleDash|flags.IgnoreUnknown)
 	if _, err := parser.Parse(); err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func getConfigFileName() (string, error) {
 	return "", nil
 }
 
-func parseConfigFile(file string, cfg interface{}) error {
+func ParseFile(file string, cfg interface{}) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
