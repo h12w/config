@@ -11,6 +11,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type HelpError struct {
+	Message string
+}
+
+func (e *HelpError) Error() string { return e.Message }
+
 func Parse(cfg interface{}) error {
 	_, err := ParseCommand(cfg)
 	return err
@@ -28,6 +34,9 @@ func ParseCommand(cfg interface{}) (*flags.Command, error) {
 	}
 	parser := flags.NewParser(cfg, flags.HelpFlag|flags.PassDoubleDash|flags.IgnoreUnknown)
 	if _, err := parser.Parse(); err != nil {
+		if e, ok := err.(*flags.Error); ok && e.Type == flags.ErrHelp {
+			return nil, &HelpError{e.Message}
+		}
 		return nil, err
 	}
 	return parser.Command.Active, nil
