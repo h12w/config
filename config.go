@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -41,7 +42,24 @@ func ParseCommand(cfg interface{}) (*flags.Command, error) {
 		}
 		return nil, err
 	}
+	if parser.Command.Active == nil {
+		var buf bytes.Buffer
+		parser.WriteHelp(&buf)
+		return nil, &HelpError{Message: buf.String()}
+	}
 	return parser.Command.Active, nil
+}
+
+func MustParseCommand(cfg interface{}) *flags.Command {
+	cmd, err := ParseCommand(cfg)
+	if err != nil {
+		if _, ok := err.(*HelpError); ok {
+			fmt.Println(err)
+			os.Exit(0)
+		}
+		log.Fatal(err)
+	}
+	return cmd
 }
 
 func getConfigFileName() (string, error) {
@@ -100,14 +118,4 @@ func fileExists(file string) bool {
 	}
 	f.Close()
 	return true
-}
-
-func CheckError(err error) {
-	if err != nil {
-		if _, ok := err.(*HelpError); ok {
-			fmt.Println(err)
-			os.Exit(0)
-		}
-		log.Fatal(err)
-	}
 }
