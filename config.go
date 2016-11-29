@@ -10,8 +10,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/jessevdk/go-flags"
 	"gopkg.in/yaml.v2"
+	"h12.me/go-flags"
 )
 
 type HelpError struct {
