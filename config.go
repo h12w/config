@@ -3,7 +3,9 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 
@@ -98,4 +100,14 @@ func fileExists(file string) bool {
 	}
 	f.Close()
 	return true
+}
+
+func CheckError(err error) {
+	if err != nil {
+		if _, ok := err.(*HelpError); ok {
+			fmt.Println(err)
+			os.Exit(0)
+		}
+		log.Fatal(err)
+	}
 }
