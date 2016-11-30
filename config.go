@@ -62,6 +62,10 @@ func MustParseCommand(cfg interface{}) *flags.Command {
 	return cmd
 }
 
+func ExecuteCommand(cfg interface{}) {
+	MustParseCommand(cfg)
+}
+
 func getConfigFileName() (string, error) {
 	var fileConfig struct {
 		ConfigFile string `long:"config"`
