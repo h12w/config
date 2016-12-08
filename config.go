@@ -21,11 +21,24 @@ type HelpError struct {
 func (e *HelpError) Error() string { return e.Message }
 
 func Parse(cfg interface{}) error {
-	_, err := ParseCommand(cfg)
+	_, err := parse(cfg)
 	return err
 }
 
 func ParseCommand(cfg interface{}) (*flags.Command, error) {
+	parser, err := parse(cfg)
+	if err != nil {
+		return nil, err
+	}
+	if parser.Command.Active == nil {
+		var buf bytes.Buffer
+		parser.WriteHelp(&buf)
+		return nil, &HelpError{Message: buf.String()}
+	}
+	return parser.Command.Active, nil
+}
+
+func parse(cfg interface{}) (*flags.Parser, error) {
 	file, err := getConfigFileName()
 	if err != nil {
 		return nil, err
@@ -42,12 +55,7 @@ func ParseCommand(cfg interface{}) (*flags.Command, error) {
 		}
 		return nil, err
 	}
-	if parser.Command.Active == nil {
-		var buf bytes.Buffer
-		parser.WriteHelp(&buf)
-		return nil, &HelpError{Message: buf.String()}
-	}
-	return parser.Command.Active, nil
+	return parser, nil
 }
 
 func MustParseCommand(cfg interface{}) *flags.Command {
