@@ -11,7 +11,7 @@ import (
 	"path"
 
 	"gopkg.in/yaml.v2"
-	"h12.me/go-flags"
+	"h12.io/go-flags"
 )
 
 type HelpError struct {
